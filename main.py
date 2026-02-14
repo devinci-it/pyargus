@@ -17,7 +17,10 @@ import os
 import sys
 import argparse
 
-from app import Application, ApplicationFactory, AppConfig, ConfigurationError
+# Add src to path for imports
+sys.path.insert(0, 'src')
+
+from pyargus import Application, ApplicationFactory, AppConfig, ConfigurationError
 
 
 def load_dotenv(env_file: str = ".env") -> None:

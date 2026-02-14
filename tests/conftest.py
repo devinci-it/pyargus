@@ -6,11 +6,15 @@ Provides common fixtures and test utilities used across test suite.
 
 import pytest
 import os
+import sys
 import tempfile
 from pathlib import Path
 
-from app import AppConfig, Application, Logger
-from app.exceptions import ConfigurationError
+# Add src to path
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+
+from pyargus import AppConfig, Application, Logger
+from pyargus.exceptions import ConfigurationError
 
 
 @pytest.fixture

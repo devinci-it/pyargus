@@ -1,8 +1,14 @@
 """Unit tests for application configuration."""
 
 import pytest
-from app import AppConfig, DatabaseConfig, APIConfig, SecurityConfig
-from app.exceptions import ConfigurationError, ValidationError
+import sys
+import os
+
+# Add src to path
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+
+from pyargus import AppConfig, DatabaseConfig, APIConfig, SecurityConfig
+from pyargus.exceptions import ConfigurationError, ValidationError
 
 
 class TestDatabaseConfig:
