@@ -52,6 +52,12 @@ setup(
         "python-dotenv==1.0.0",
         # Utilities
         "python-dateutil==2.8.2",
+        # Logging
+        "pylogger>=1.2.0",
+        "tabulate>=0.9.0",
+        "colorama>=0.4.0",
+        "flask>=2.0.0",
+        "flask-cors>=3.0.0",
     ],
     extras_require={
         "dev": [

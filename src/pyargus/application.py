@@ -6,9 +6,10 @@ container using the Factory pattern. It serves as the single entry point for
 initializing all application components.
 """
 
-import logging
 from typing import Optional, List
 from abc import ABC, abstractmethod
+
+from pylogger import Logger as PyLogger
 
 from .config import AppConfig
 from .exceptions import ConfigurationError
@@ -39,45 +40,54 @@ class ILogger(ABC):
 
 
 class Logger(ILogger):
-    """Concrete implementation of ILogger using Python's logging module."""
+    """Concrete implementation of ILogger using PyLogger."""
     
-    def __init__(self, name: str, level: str = "INFO"):
+    _instance: Optional['Logger'] = None
+    
+    def __init__(self, name: str = "PyArgus", level: str = "INFO"):
         """
-        Initialize logger.
+        Initialize logger using PyLogger.
         
         Args:
             name: Logger name (usually __name__ of the module)
             level: Logging level (DEBUG, INFO, WARNING, ERROR)
         """
-        self._logger = logging.getLogger(name)
-        self._logger.setLevel(getattr(logging, level.upper()))
+        self._name = name
+        self._pylogger = PyLogger.instance()
         
-        if not self._logger.handlers:
-            handler = logging.StreamHandler()
-            formatter = logging.Formatter(
-                '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-            )
-            handler.setFormatter(formatter)
-            self._logger.addHandler(handler)
+        # Map string level to PyLogger levels
+        level_map = {
+            "DEBUG": 10,
+            "INFO": 20,
+            "WARNING": 30,
+            "ERROR": 40,
+            "CRITICAL": 50
+        }
+        self._level = level_map.get(level.upper(), 20)
+        self._pylogger.setLevel(self._level)
     
     def debug(self, message: str, **kwargs) -> None:
         """Log debug message."""
-        self._logger.debug(message, **kwargs)
+        json_data = kwargs.pop('json_data', kwargs if kwargs else None)
+        self._pylogger.debug(message, json_data=json_data)
     
     def info(self, message: str, **kwargs) -> None:
         """Log info message."""
-        self._logger.info(message, **kwargs)
+        json_data = kwargs.pop('json_data', kwargs if kwargs else None)
+        self._pylogger.info(message, json_data=json_data)
     
     def warning(self, message: str, **kwargs) -> None:
         """Log warning message."""
-        self._logger.warning(message, **kwargs)
+        json_data = kwargs.pop('json_data', kwargs if kwargs else None)
+        self._pylogger.warning(message, json_data=json_data)
     
     def error(self, message: str, exception: Exception = None, **kwargs) -> None:
         """Log error message with optional exception."""
+        json_data = kwargs.pop('json_data', kwargs if kwargs else None)
         if exception:
-            self._logger.error(message, exc_info=True, **kwargs)
+            self._pylogger.exception(message, json_data=json_data)
         else:
-            self._logger.error(message, **kwargs)
+            self._pylogger.error(message, json_data=json_data)
 
 
 class IDependencyContainer(ABC):
@@ -315,7 +325,14 @@ class ApplicationFactory:
     """
     
     _instance: Optional[Application] = None
-    _logger = logging.getLogger(__name__)
+    _logger: Optional[Logger] = None
+    
+    @classmethod
+    def _get_logger(cls) -> Logger:
+        """Get or create factory logger."""
+        if cls._logger is None:
+            cls._logger = Logger("ApplicationFactory", level="INFO")
+        return cls._logger
     
     @classmethod
     def create(cls, config: Optional[AppConfig] = None) -> Application:
