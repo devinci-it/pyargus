@@ -54,7 +54,7 @@ class Logger(ILogger):
             name: Logger name (usually __name__ of the module)
             level: Logging level (DEBUG, INFO, WARNING, ERROR)
         """
-        self._name = name
+        self._name = "pyargus"
         self._pylogger = PyLogger.instance()
         
         # Map string level to PyLogger levels
@@ -67,6 +67,8 @@ class Logger(ILogger):
         }
         self._level = level_map.get(level.upper(), 20)
         self._pylogger.setLevel(self._level)
+        self._pylogger._app_name= self._name
+
     
     def debug(self, message: str, **kwargs) -> None:
         """Log debug message."""

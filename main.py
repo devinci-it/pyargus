@@ -20,25 +20,45 @@ import argparse
 # Add src to path for imports
 sys.path.insert(0, 'src')
 
-from pyargus import Application, ApplicationFactory, AppConfig, ConfigurationError
+from pyargus import (
+    Application,
+    ApplicationFactory,
+    AppConfig,
+    ConfigurationError,
+    LoggerConfigurator,
+    Logger,
+    build_log_decorator,
+)
 
 
-def load_dotenv(env_file: str = ".env") -> None:
+def load_dotenv(env_file: str = ".env", logger: Logger = None) -> None:
     """
     Load environment variables from .env file.
     
     Args:
         env_file: Path to .env file
+        logger: Logger instance for logging output
     """
     if os.path.exists(env_file):
         try:
             from dotenv import load_dotenv
             load_dotenv(env_file)
-            print(f"✓ Loaded environment from {env_file}")
+            if logger:
+                logger.info(f"Loaded environment from {env_file}")
+            else:
+                print(f"✓ Loaded environment from {env_file}")
         except ImportError:
-            print(f"Warning: python-dotenv not installed, skipping .env file")
+            msg = "python-dotenv not installed, skipping .env file"
+            if logger:
+                logger.warning(msg)
+            else:
+                print(f"Warning: {msg}")
     else:
-        print(f"Warning: {env_file} not found, using environment variables")
+        msg = f"{env_file} not found, using environment variables"
+        if logger:
+            logger.warning(msg)
+        else:
+            print(f"Warning: {msg}")
 
 
 def parse_arguments() -> argparse.Namespace:
@@ -141,36 +161,54 @@ def main() -> int:
     Returns:
         int: Exit code (0 for success, 1 for failure)
     """
+    logger = None
     try:
         # Parse command-line arguments
         args = parse_arguments()
         
-        # Load environment configuration
+        # Load environment configuration (before logger init)
         load_dotenv(args.config)
         
         # Create application configuration
         config = create_app_config(args)
         
-        # Print startup information
-        print("\n" + "="*60)
-        print(f"  {config.app_name} v{config.version}")
-        print("="*60)
-        print(f"Environment: {config.environment}")
-        print(f"Debug Mode: {config.debug}")
-        print(f"API: {config.api.host}:{config.api.port}")
-        print(f"Workers: {config.api.workers}")
-        print(f"Database: {config.database.database_url}")
-        print("="*60 + "\n")
+        # Initialize logger
+        pylogger_instance = LoggerConfigurator.configure(config)
+        logger = LoggerConfigurator.get_logger()
+        
+        # Log and print startup information
+        startup_msg = f"""
+{'='*60}
+  {config.app_name} v{config.version}
+{'='*60}
+Environment: {config.environment}
+Debug Mode: {config.debug}
+API: {config.api.host}:{config.api.port}
+Workers: {config.api.workers}
+Database: {config.database.database_url}
+{'='*60}
+"""
+        print(startup_msg)
+        logger.info(f"Starting {config.app_name} v{config.version}")
+        logger.info(f"Environment: {config.environment}")
+        logger.info(f"Debug Mode: {config.debug}")
+        logger.info(f"API: {config.api.host}:{config.api.port}")
         
         # Create and initialize application
         print("Initializing application...")
         app = ApplicationFactory.create(config)
         ApplicationFactory.set_instance(app)
         
+        # Log application initialization
+        logger.info("Application initialized successfully")
+        logger.info("Application is ready to serve")
+        
         print("✓ Application initialized successfully")
         print(f"✓ Application is ready to serve")
         print(f"\nAPI Server is running at http://{config.api.host}:{config.api.port}")
         print("Press Ctrl+C to stop the server\n")
+        
+        logger.info(f"API Server listening at http://{config.api.host}:{config.api.port}")
         
         # TODO: Start FastAPI server here
         # This is where uvicorn.run() would be called
@@ -179,17 +217,31 @@ def main() -> int:
         return 0
         
     except ConfigurationError as e:
-        print(f"\n❌ Configuration Error: {e.message}", file=sys.stderr)
-        print(f"   Error Code: {e.error_code}", file=sys.stderr)
+        error_msg = f"Configuration Error: {e.message} (Error Code: {e.error_code})"
+        if logger:
+            logger.error(error_msg)
+        else:
+            print(f"\n❌ {error_msg}", file=sys.stderr)
+        print(f"\n❌ {error_msg}", file=sys.stderr)
         return 1
     except KeyboardInterrupt:
         print("\n\nShutdown signal received...")
+        if logger:
+            logger.info("Shutdown signal received")
         if ApplicationFactory.get_instance():
+            if logger:
+                logger.info("Shutting down application")
+            print("Shutting down application...")
             ApplicationFactory.get_instance().shutdown()
+        if logger:
+            logger.info("Application shutdown completed")
         print("✓ Application shutdown completed")
         return 0
     except Exception as e:
-        print(f"\n❌ Unexpected Error: {str(e)}", file=sys.stderr)
+        error_msg = f"Unexpected Error: {str(e)}"
+        if logger:
+            logger.error(error_msg, exc_info=True)
+        print(f"\n❌ {error_msg}", file=sys.stderr)
         import traceback
         traceback.print_exc()
         return 1
