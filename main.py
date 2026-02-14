@@ -20,44 +20,53 @@ import argparse
 # Add src to path for imports
 sys.path.insert(0, 'src')
 
+# ============================================================================
+# BOOTSTRAP: Load environment and configure logger FIRST
+# ============================================================================
+def bootstrap_logger():
+    """
+    Bootstrap PyLogger from environment variables before importing main app.
+    This must happen early to enable logging throughout the application.
+    
+    Returns:
+        Logger: Configured logger instance
+    """
+    from dotenv import load_dotenv
+    from pylogger import SettingsBuilder
+    
+    # Load environment variables
+    if os.path.exists('.env'):
+        load_dotenv('.env')
+        print("✓ Loaded environment from .env")
+    
+    # Configure logger from environment variables
+    logger = (SettingsBuilder()
+        .app_name(os.getenv('PYLOGGER_APP_NAME', 'PyArgus'))
+        .development(os.getenv('PYLOGGER_DEVELOPMENT', 'true').lower() == 'true')
+        .echo(os.getenv('PYLOGGER_ECHO', 'true').lower() == 'true')
+        .level(os.getenv('PYLOGGER_LEVEL', 'DEBUG'))
+        .log_dir(os.getenv('PYLOGGER_LOG_DIR', './logs'))
+        .build())
+    
+    return logger
+
+# Configure logger immediately at startup
+logger = bootstrap_logger()
+
+# Now we can use the logger throughout bootstrap
+from pylogger import build_log_decorator
+
 from pyargus import (
     Application,
     ApplicationFactory,
     AppConfig,
     ConfigurationError,
-    LoggerConfigurator,
-    build_log_decorator,
 )
 
 
-def load_dotenv(env_file: str = ".env", logger=None) -> None:
-    """
-    Load environment variables from .env file.
-    
-    Args:
-        env_file: Path to .env file
-        logger: Logger instance for logging output
-    """
-    if os.path.exists(env_file):
-        try:
-            from dotenv import load_dotenv
-            load_dotenv(env_file)
-            if logger:
-                logger.info(f"Loaded environment from {env_file}")
-            else:
-                print(f"✓ Loaded environment from {env_file}")
-        except ImportError:
-            msg = "python-dotenv not installed, skipping .env file"
-            if logger:
-                logger.warning(msg)
-            else:
-                print(f"Warning: {msg}")
-    else:
-        msg = f"{env_file} not found, using environment variables"
-        if logger:
-            logger.warning(msg)
-        else:
-            print(f"Warning: {msg}")
+def load_dotenv_legacy(env_file: str = ".env") -> None:
+    """Legacy function - dotenv now loaded in bootstrap_logger."""
+    pass
 
 
 def parse_arguments() -> argparse.Namespace:
@@ -160,22 +169,14 @@ def main() -> int:
     Returns:
         int: Exit code (0 for success, 1 for failure)
     """
-    logger = None
     try:
         # Parse command-line arguments
         args = parse_arguments()
         
-        # Load environment configuration (before logger init)
-        load_dotenv(args.config)
-        
         # Create application configuration
         config = create_app_config(args)
         
-        # Initialize logger
-        pylogger_instance = LoggerConfigurator.configure(config)
-        logger = LoggerConfigurator.get_logger()
-        
-        # Log and print startup information
+        # Log startup information using the pre-configured logger
         startup_msg = f"""
 {'='*60}
   {config.app_name} v{config.version}
@@ -189,18 +190,19 @@ Database: {config.database.database_url}
 """
         print(startup_msg)
         logger.info(f"Starting {config.app_name} v{config.version}")
-        logger.info(f"Environment: {config.environment}")
-        logger.info(f"Debug Mode: {config.debug}")
-        logger.info(f"API: {config.api.host}:{config.api.port}")
+        logger.debug(f"Environment: {config.environment}")
+        logger.debug(f"Debug Mode: {config.debug}")
+        logger.debug(f"API: {config.api.host}:{config.api.port}")
         
         # Create and initialize application
         print("Initializing application...")
+        logger.info("Initializing application")
         app = ApplicationFactory.create(config)
         ApplicationFactory.set_instance(app)
+        app.initialize()
         
-        # Log application initialization
         logger.info("Application initialized successfully")
-        logger.info("Application is ready to serve")
+        logger.debug("Application is ready to serve")
         
         print("✓ Application initialized successfully")
         print(f"✓ Application is ready to serve")
@@ -217,29 +219,22 @@ Database: {config.database.database_url}
         
     except ConfigurationError as e:
         error_msg = f"Configuration Error: {e.message} (Error Code: {e.error_code})"
-        if logger:
-            logger.error(error_msg)
-        else:
-            print(f"\n❌ {error_msg}", file=sys.stderr)
+        logger.error(error_msg)
         print(f"\n❌ {error_msg}", file=sys.stderr)
         return 1
     except KeyboardInterrupt:
         print("\n\nShutdown signal received...")
-        if logger:
-            logger.info("Shutdown signal received")
+        logger.info("Shutdown signal received")
         if ApplicationFactory.get_instance():
-            if logger:
-                logger.info("Shutting down application")
+            logger.info("Shutting down application")
             print("Shutting down application...")
             ApplicationFactory.get_instance().shutdown()
-        if logger:
-            logger.info("Application shutdown completed")
+        logger.info("Application shutdown completed")
         print("✓ Application shutdown completed")
         return 0
     except Exception as e:
         error_msg = f"Unexpected Error: {str(e)}"
-        if logger:
-            logger.error(error_msg, exc_info=True)
+        logger.error(error_msg, exc_info=True)
         print(f"\n❌ {error_msg}", file=sys.stderr)
         import traceback
         traceback.print_exc()
