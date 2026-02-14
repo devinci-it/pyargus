@@ -180,7 +180,7 @@ python main.py --environment production # Production
 
 ### Configuration Management
 ```python
-from app import AppConfig
+from pyargus import AppConfig
 
 # Singleton pattern
 config = AppConfig.get_instance()
@@ -191,7 +191,7 @@ config = AppConfig.from_env()
 
 ### Centralized Service Management
 ```python
-from app import ApplicationFactory
+from pyargus import ApplicationFactory
 
 # Create and initialize
 app = ApplicationFactory.create()
@@ -204,7 +204,7 @@ config = app.config
 
 ### Service Implementation Template
 ```python
-from app.base_service import BaseService
+from pyargus.base_service import BaseService
 
 class MyService(BaseService):
     def initialize(self):

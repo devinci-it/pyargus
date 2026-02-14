@@ -148,8 +148,8 @@ DELETE /clients/{client_id}  # Delete client
 
 ```python
 from fastapi import APIRouter, HTTPException, status
-from app.api.schemas import ClientRegistrationRequest, ClientRegistrationResponse
-from app.api.handlers import handle_client_registration
+from pyargus.api.schemas import ClientRegistrationRequest, ClientRegistrationResponse
+from pyargus.api.handlers import handle_client_registration
 
 router = APIRouter(prefix="/api", tags=["clients"])
 
@@ -174,7 +174,7 @@ async def register_client(request: ClientRegistrationRequest):
 ```python
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.routes import router
+from pyargus.api.routes import router
 
 app = FastAPI(
     title="PyArgus",
@@ -212,7 +212,7 @@ Map PyArgus exceptions to HTTP responses:
 ```python
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
-from app import PyArgusException, ValidationError
+from pyargus import PyArgusException, ValidationError
 
 @app.exception_handler(ValidationError)
 async def validation_error_handler(request, exc):
@@ -333,7 +333,7 @@ async def protected_route(token: str = Depends(verify_token)):
 
 ```python
 from fastapi.testclient import TestClient
-from app.api import app
+from pyargus.api import app
 
 client = TestClient(app)
 

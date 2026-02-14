@@ -146,7 +146,7 @@ On application startup:
 ```python
 # In Application.initialize()
 from migrations.runner import run_migrations
-from app.config import config
+from pyargus.config import config
 
 run_migrations(config.database.database_url)
 ```

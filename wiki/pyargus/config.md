@@ -118,7 +118,7 @@ config = DatabaseConfig(database_url="")
 
 ### Basic Usage
 ```python
-from app import AppConfig
+from pyargus import AppConfig
 
 config = AppConfig.get_instance()
 
@@ -130,7 +130,7 @@ print(config.security.encryption_key)
 
 ### Load from Environment
 ```python
-from app import AppConfig
+from pyargus import AppConfig
 import os
 
 # Set environment variables
@@ -145,7 +145,7 @@ config = AppConfig.from_env()
 
 ### Custom Configuration
 ```python
-from app import AppConfig, DatabaseConfig, APIConfig, SecurityConfig
+from pyargus import AppConfig, DatabaseConfig, APIConfig, SecurityConfig
 
 config = AppConfig(
     app_name="PyArgus-Custom",
@@ -162,7 +162,7 @@ config = AppConfig(
 
 ### Reset Singleton (Testing)
 ```python
-from app import AppConfig
+from pyargus import AppConfig
 
 # Reset for clean state
 AppConfig.reset_instance()
@@ -232,7 +232,7 @@ DEFAULT_PORT_END=9999
 
 ```python
 import pytest
-from app import AppConfig
+from pyargus import AppConfig
 
 @pytest.fixture
 def test_config():

@@ -127,7 +127,7 @@ pyargus/
 
 **Usage**:
 ```python
-from app import AppConfig
+from pyargus import AppConfig
 
 # Get singleton instance
 config = AppConfig.get_instance()
@@ -187,7 +187,7 @@ print(config.database.database_url)
 
 **Usage**:
 ```python
-from app import ApplicationFactory, AppConfig
+from pyargus import ApplicationFactory, AppConfig
 
 # Create and initialize application
 app = ApplicationFactory.create()
@@ -231,7 +231,7 @@ app.shutdown()
 
 **Example Service Implementation**:
 ```python
-from app.base_service import BaseService
+from pyargus.base_service import BaseService
 
 class SSHManager(BaseService):
     def __init__(self, logger):
@@ -275,7 +275,7 @@ python main.py --config /etc/pyargus/.env
 ### From Python Code
 
 ```python
-from app import ApplicationFactory, AppConfig
+from pyargus import ApplicationFactory, AppConfig
 
 # Custom configuration
 config = AppConfig.from_env()
@@ -366,7 +366,7 @@ pytest tests/test_config.py::test_config_validation
 4. Register in `Application._register_core_services()`
 
 ```python
-from app.base_service import BaseService
+from pyargus.base_service import BaseService
 
 class SSHManager(BaseService):
     def __init__(self, logger):

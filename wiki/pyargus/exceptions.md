@@ -38,7 +38,7 @@ Base exception for all PyArgus-specific errors. Includes:
 
 **Usage**:
 ```python
-from app import PyArgusException
+from pyargus import PyArgusException
 
 try:
     # Something went wrong
@@ -58,7 +58,7 @@ Raised when application configuration is invalid or incomplete.
 
 **Example**:
 ```python
-from app import ConfigurationError
+from pyargus import ConfigurationError
 
 if not os.environ.get("ENCRYPTION_KEY"):
     raise ConfigurationError("ENCRYPTION_KEY must be set in environment")
@@ -73,7 +73,7 @@ Raised when database operations fail.
 
 **Example**:
 ```python
-from app import DatabaseError
+from pyargus import DatabaseError
 
 try:
     db.save(record)
@@ -90,7 +90,7 @@ Raised when data validation fails. Optionally tracks which field failed.
 
 **Example**:
 ```python
-from app import ValidationError
+from pyargus import ValidationError
 
 def validate_email(email: str):
     if "@" not in email:
@@ -106,7 +106,7 @@ Raised when authentication fails (invalid credentials, expired tokens, etc.).
 
 **Example**:
 ```python
-from app import AuthenticationError
+from pyargus import AuthenticationError
 
 def verify_client(client_id: str, credentials: str):
     if not is_valid(credentials):
@@ -122,7 +122,7 @@ Raised when user lacks required permissions/authorization.
 
 **Example**:
 ```python
-from app import AuthorizationError
+from pyargus import AuthorizationError
 
 def delete_client(client_id: str, user_id: str):
     if not is_admin(user_id):
@@ -138,7 +138,7 @@ Raised when SSH operations fail (key loading, connection errors, etc.).
 
 **Example**:
 ```python
-from app import SSHError
+from pyargus import SSHError
 
 try:
     ssh_manager.load_key(key_path)
@@ -155,7 +155,7 @@ Raised when encryption/decryption operations fail.
 
 **Example**:
 ```python
-from app import EncryptionError
+from pyargus import EncryptionError
 
 try:
     decrypted = decrypt_key(encrypted_data, key)
@@ -172,7 +172,7 @@ Raised when a requested resource is not found.
 
 **Example**:
 ```python
-from app import ResourceNotFoundError
+from pyargus import ResourceNotFoundError
 
 def get_client(client_id: str):
     client = db.get_client_by_id(client_id)
@@ -190,7 +190,7 @@ Raised when a resource already exists (duplicate, conflict, etc.).
 
 **Example**:
 ```python
-from app import ResourceConflictError
+from pyargus import ResourceConflictError
 
 def register_client(hostname: str):
     if db.client_exists(hostname):
@@ -202,7 +202,7 @@ def register_client(hostname: str):
 
 ### Basic Exception Handling
 ```python
-from app import PyArgusException, ConfigurationError
+from pyargus import PyArgusException, ConfigurationError
 
 try:
     # Do something
@@ -215,7 +215,7 @@ except PyArgusException as e:
 
 ### Specific Error Detection
 ```python
-from app import ResourceNotFoundError, AuthenticationError
+from pyargus import ResourceNotFoundError, AuthenticationError
 
 try:
     user = get_user(user_id)
@@ -229,7 +229,7 @@ except AuthenticationError as e:
 
 ### Re-raising with Context
 ```python
-from app import DatabaseError, ValidationError
+from pyargus import DatabaseError, ValidationError
 
 try:
     validate_data(data)
@@ -240,8 +240,8 @@ except ValidationError as e:
 
 ### Logging Errors
 ```python
-from app import PyArgusException
-from app import Logger
+from pyargus import PyArgusException
+from pyargus import Logger
 
 logger = Logger(__name__)
 
@@ -279,7 +279,7 @@ except PyArgusException as e:
 ### API Responses
 Easily convert to HTTP responses:
 ```python
-from app import PyArgusException
+from pyargus import PyArgusException
 
 try:
     result = register_client(request_data)
@@ -295,7 +295,7 @@ except PyArgusException as e:
 Specific exceptions make tests clearer:
 ```python
 import pytest
-from app import ResourceNotFoundError, ValidationError
+from pyargus import ResourceNotFoundError, ValidationError
 
 def test_missing_client():
     with pytest.raises(ResourceNotFoundError):
@@ -320,7 +320,7 @@ def test_invalid_email():
 ## Example: Complete Error Handling
 
 ```python
-from app import (
+from pyargus import (
     ValidationError,
     AuthenticationError,
     ResourceNotFoundError,

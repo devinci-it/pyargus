@@ -41,7 +41,7 @@ Concrete logger implementation wrapping Python's logging module.
 
 **Usage**:
 ```python
-from app import Logger
+from pyargus import Logger
 
 logger = Logger("my_module", "DEBUG")
 logger.info("Application started")
@@ -81,7 +81,7 @@ Service registry implementing the Registry pattern for dependency management.
 
 **Usage**:
 ```python
-from app import DependencyContainer, Logger
+from pyargus import DependencyContainer, Logger
 
 container = DependencyContainer()
 
@@ -133,7 +133,7 @@ Main application orchestrator. Coordinates:
 
 **Example**:
 ```python
-from app import Application, AppConfig
+from pyargus import Application, AppConfig
 
 # Create with custom config
 config = AppConfig(app_name="MyApp")
@@ -167,7 +167,7 @@ Factory for creating and managing Application instances using Factory and Single
 
 **Usage**:
 ```python
-from app import ApplicationFactory
+from pyargus import ApplicationFactory
 
 # Create and initialize
 app = ApplicationFactory.create()
@@ -211,7 +211,7 @@ Application.initialize()
 
 ### Basic Application Setup
 ```python
-from app import ApplicationFactory
+from pyargus import ApplicationFactory
 
 # Create application
 app = ApplicationFactory.create()
@@ -228,7 +228,7 @@ logger.info(f"Port: {config.api.port}")
 
 ### Custom Configuration
 ```python
-from app import Application, AppConfig
+from pyargus import Application, AppConfig
 
 config = AppConfig(
     app_name="PyArgus",
@@ -307,7 +307,7 @@ logger.error("Error message", exception=e)
 ## Error Handling
 
 ```python
-from app import Application, ConfigurationError
+from pyargus import Application, ConfigurationError
 
 try:
     app = Application()
@@ -326,7 +326,7 @@ except Exception as e:
 
 ```python
 import pytest
-from app import Application, ApplicationFactory
+from pyargus import Application, ApplicationFactory
 
 @pytest.fixture
 def test_app():

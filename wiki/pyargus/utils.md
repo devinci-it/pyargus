@@ -125,7 +125,7 @@ def is_localhost(ip_string: str) -> bool:
 
 **Usage**:
 ```python
-from app.utils.ip_utils import (
+from pyargus.utils.ip_utils import (
     validate_ip_address,
     is_private_ip,
     get_client_ip_address,
@@ -269,7 +269,7 @@ def get_port_range_status(
 
 **Usage**:
 ```python
-from app.utils.port_utils import (
+from pyargus.utils.port_utils import (
     validate_port,
     is_port_available,
     get_next_available_port,
@@ -298,8 +298,8 @@ print(f"Available: {status['available']}/{status['total']}")
 ### Registering a Client
 
 ```python
-from app.utils.ip_utils import validate_ip_address, resolve_hostname
-from app.utils.port_utils import get_next_available_port
+from pyargus.utils.ip_utils import validate_ip_address, resolve_hostname
+from pyargus.utils.port_utils import get_next_available_port
 
 def register_client(hostname: str, ip_address: str):
     # Validate IP
@@ -322,7 +322,7 @@ def register_client(hostname: str, ip_address: str):
 ### Health Check
 
 ```python
-from app.utils.port_utils import get_port_range_status
+from pyargus.utils.port_utils import get_port_range_status
 
 def check_port_availability():
     status = get_port_range_status(9221, 9999)
@@ -346,8 +346,8 @@ def check_port_availability():
 
 ```python
 import pytest
-from app.utils.ip_utils import validate_ip_address
-from app.utils.port_utils import validate_port, get_next_available_port
+from pyargus.utils.ip_utils import validate_ip_address
+from pyargus.utils.port_utils import validate_port, get_next_available_port
 
 def test_validate_ip():
     assert validate_ip_address("192.168.1.1")

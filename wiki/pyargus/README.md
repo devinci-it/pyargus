@@ -233,14 +233,14 @@ See: [scripts.md](scripts.md)
 
 ### Get Configuration
 ```python
-from app import AppConfig
+from pyargus import AppConfig
 config = AppConfig.get_instance()
 ```
 See: [config.md](config.md)
 
 ### Access Application
 ```python
-from app import ApplicationFactory
+from pyargus import ApplicationFactory
 app = ApplicationFactory.get_instance()
 ```
 See: [application.md](application.md)

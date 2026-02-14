@@ -139,7 +139,7 @@ Tests for REST endpoints.
 # tests/test_api/test_routes.py
 
 from fastapi.testclient import TestClient
-from app.api import app
+from pyargus.api import app
 
 client = TestClient(app)
 
@@ -301,8 +301,8 @@ pytest --cov=app --cov-fail-under=80
 ```python
 # tests/test_my_module.py
 import pytest
-from app.my_module import MyService
-from app import Logger
+from pyargus.my_module import MyService
+from pyargus import Logger
 
 @pytest.fixture
 def my_logger():

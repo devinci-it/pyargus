@@ -47,7 +47,7 @@ python scripts/start_server.py --workers 8
 ```python
 #!/usr/bin/env python3
 import uvicorn
-from app import ApplicationFactory
+from pyargus import ApplicationFactory
 
 # Create and initialize app
 app = ApplicationFactory.create()
@@ -217,7 +217,7 @@ echo "Running cleanup..."
 find /var/log/pyargus -name "*.log" -mtime +30 -exec gzip {} \;
 
 # Remove inactive clients
-python -c "from app.models import Client; \
+python -c "from pyargus.models import Client; \
     Client.delete().where(Client.status == 'inactive').execute()"
 
 # Clean temp files

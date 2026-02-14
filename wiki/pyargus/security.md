@@ -106,7 +106,7 @@ def decrypt_key(encrypted_data: str, encryption_key: str) -> str:
 
 **Usage**:
 ```python
-from app.security.encryption import encrypt_key, decrypt_key
+from pyargus.security.encryption import encrypt_key, decrypt_key
 
 # Encrypt a key
 private_key_content = "-----BEGIN RSA PRIVATE KEY-----\n..."
@@ -230,7 +230,7 @@ def extract_fingerprint(public_key: str) -> str:
 
 **Usage**:
 ```python
-from app.security.key_validator import (
+from pyargus.security.key_validator import (
     validate_ssh_key_format,
     extract_key_type,
     extract_fingerprint
@@ -256,8 +256,8 @@ print(f"Fingerprint: {fingerprint}")
 Security module will be used by SSH Manager:
 
 ```python
-from app.security.encryption import encrypt_key, decrypt_key
-from app.security.key_validator import validate_ssh_key_format
+from pyargus.security.encryption import encrypt_key, decrypt_key
+from pyargus.security.key_validator import validate_ssh_key_format
 
 class SSHManager(BaseService):
     def store_client_key(self, client_id, private_key_content):
@@ -308,8 +308,8 @@ class SSHManager(BaseService):
 
 ```python
 import pytest
-from app.security.encryption import encrypt_key, decrypt_key
-from app.security.key_validator import validate_ssh_key_format
+from pyargus.security.encryption import encrypt_key, decrypt_key
+from pyargus.security.key_validator import validate_ssh_key_format
 
 def test_encrypt_decrypt():
     key_content = "-----BEGIN RSA PRIVATE KEY-----\nMIIE...\n-----END RSA PRIVATE KEY-----"

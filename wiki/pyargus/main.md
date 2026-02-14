@@ -24,7 +24,7 @@ Single, clear entry point for the PyArgus application. Handles command-line argu
 import os, sys, argparse
 from pathlib import Path
 
-from app import Application, ApplicationFactory, AppConfig, ConfigurationError
+from pyargus import Application, ApplicationFactory, AppConfig, ConfigurationError
 
 # Configuration
 def load_dotenv(env_file: str) -> None: ...
@@ -355,7 +355,7 @@ import sys
 # Add project to path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from app import ApplicationFactory
+from pyargus import ApplicationFactory
 
 # Create application
 app = ApplicationFactory.create()

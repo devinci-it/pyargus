@@ -52,7 +52,7 @@ isort app/ tests/                   # Sort imports
 ### Debugging
 ```python
 # Use the logger
-from app import Application
+from pyargus import Application
 
 app = ApplicationFactory.create()
 logger = app.logger
@@ -68,7 +68,7 @@ logger.error("Error!", exception)
 ### Step 1: Create service module
 ```python
 # app/my_service.py
-from app.base_service import BaseService
+from pyargus.base_service import BaseService
 
 class MyService(BaseService):
     def __init__(self, logger):
@@ -96,7 +96,7 @@ self._container.register("my_service", my_service)
 
 ### Step 3: Use in code
 ```python
-from app import ApplicationFactory
+from pyargus import ApplicationFactory
 
 app = ApplicationFactory.get_instance()
 my_service = app.container.get("my_service")
@@ -139,7 +139,7 @@ def my_endpoint(request: MyRequest):
 
 ### Raise specific exceptions
 ```python
-from app import ValidationError, ResourceNotFoundError
+from pyargus import ValidationError, ResourceNotFoundError
 
 # Data validation
 if not email:
@@ -152,7 +152,7 @@ if not client:
 
 ### Handle exceptions
 ```python
-from app import PyArgusException
+from pyargus import PyArgusException
 
 try:
     # Code
@@ -167,7 +167,7 @@ except PyArgusException as e:
 
 ### Access configuration
 ```python
-from app import AppConfig, ApplicationFactory
+from pyargus import AppConfig, ApplicationFactory
 
 # As singleton
 config = AppConfig.get_instance()
@@ -181,7 +181,7 @@ config = app.config
 ### From environment
 ```python
 import os
-from app import AppConfig
+from pyargus import AppConfig
 
 # Set env variables
 os.environ["API_PORT"] = "9000"

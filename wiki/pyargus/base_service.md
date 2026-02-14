@@ -82,7 +82,7 @@ def some_method(self):
 ### Service Implementation Example
 
 ```python
-from app.base_service import BaseService
+from pyargus.base_service import BaseService
 
 class SSHManager(BaseService):
     """Manages SSH operations."""
@@ -211,8 +211,8 @@ Service Stopped
 ### Implementing a Service
 
 ```python
-from app.base_service import BaseService
-from app import Logger
+from pyargus.base_service import BaseService
+from pyargus import Logger
 
 class DatabaseService(BaseService):
     def __init__(self, logger, connection_string):
@@ -254,8 +254,8 @@ class DatabaseService(BaseService):
 ### Using ServiceRegistry
 
 ```python
-from app.base_service import ServiceRegistry
-from app import Logger
+from pyargus.base_service import ServiceRegistry
+from pyargus import Logger
 
 logger = Logger("app", "INFO")
 registry = ServiceRegistry(logger)
@@ -347,8 +347,8 @@ class MyService(BaseService):
 
 ```python
 import pytest
-from app.base_service import BaseService
-from app import Logger
+from pyargus.base_service import BaseService
+from pyargus import Logger
 
 class TestService(BaseService):
     def __init__(self, logger):
