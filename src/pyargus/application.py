@@ -13,6 +13,7 @@ from pylogger import Logger as PyLogger
 
 from .config import AppConfig
 from .exceptions import ConfigurationError
+from .logging_config import LoggerConfigurator
 
 
 class ILogger(ABC):
@@ -183,7 +184,10 @@ class Application:
         Raises:
             ConfigurationError: If configuration is invalid
         """
-        self._config = config or AppConfig.from_env()
+        self._config = config or AppConfig.from_env()        
+        # Configure PyLogger with app config
+        LoggerConfigurator.configure(self._config)
+        
         self._container = DependencyContainer()
         self._logger = Logger(
             self.__class__.__name__,

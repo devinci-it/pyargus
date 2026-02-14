@@ -11,6 +11,7 @@ from typing import Optional, Any, Dict
 
 from .application import ILogger
 from .exceptions import PyArgusException
+from .logging_config import LoggerConfigurator
 
 
 class BaseService(ABC):
