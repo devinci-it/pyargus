@@ -26,12 +26,11 @@ from pyargus import (
     AppConfig,
     ConfigurationError,
     LoggerConfigurator,
-    Logger,
     build_log_decorator,
 )
 
 
-def load_dotenv(env_file: str = ".env", logger: Logger = None) -> None:
+def load_dotenv(env_file: str = ".env", logger=None) -> None:
     """
     Load environment variables from .env file.
     
