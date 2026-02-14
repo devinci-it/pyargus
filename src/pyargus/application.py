@@ -6,6 +6,7 @@ container using the Factory pattern. It serves as the single entry point for
 initializing all application components.
 """
 
+import logging
 from typing import Optional, List
 from abc import ABC, abstractmethod
 
