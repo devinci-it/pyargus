@@ -38,10 +38,7 @@ setup(
     python_requires=">=3.9",
     install_requires=[
         # Web Framework
-        "fastapi==0.104.1",
         "uvicorn[standard]==0.24.0",
-        "pydantic==2.5.0",
-        "pydantic-settings==2.1.0",
         # Database ORM
         "peewee==3.17.0",
         # SSH Management
@@ -53,11 +50,9 @@ setup(
         # Utilities
         "python-dateutil==2.8.2",
         # Logging
-        "pylogger>=1.2.0",
+        "pylogger",
         "tabulate>=0.9.0",
         "colorama>=0.4.0",
-        "flask>=2.0.0",
-        "flask-cors>=3.0.0",
     ],
     extras_require={
         "dev": [
@@ -79,9 +74,16 @@ setup(
     },
     entry_points={
         "console_scripts": [
-            "pyargus=main:main",
+            "pyargus=pyargus.app:main",
         ],
     },
     include_package_data=True,
+    package_data={
+        "": ["lib/**/*"],
+    },
+    data_files=[
+        ("lib/pylogger", ["lib/pylogger/pylogger-1.2.0-py3-none-any.whl"]),
+    ],
     zip_safe=False,
+    
 )

@@ -1,0 +1,9 @@
+include README.md
+include LICENSE
+include .env.example
+recursive-include lib *
+recursive-include wiki *
+recursive-include src *
+recursive-include tests *
+recursive-include migrations *
+recursive-include scripts *

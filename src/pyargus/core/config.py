@@ -10,6 +10,8 @@ from typing import Optional
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from .paths import get_app_data_dir, get_logs_dir
+
 
 @dataclass
 class DatabaseConfig:
@@ -45,20 +47,44 @@ class APIConfig:
 class SecurityConfig:
     """Security-related configuration settings."""
     
-    encryption_key: str
-    ssh_key_path: str
+    encryption_key: str = ""
+    ssh_key_path: str = ""
     authorized_keys_path: Optional[str] = None
     default_port_start: int = 9221
     default_port_end: int = 9999
     
     def __post_init__(self):
         """Validate security configuration."""
+        is_production = os.getenv('ENVIRONMENT', 'development') == 'production'
+        
+        # Handle encryption key
         if not self.encryption_key:
-            raise ValueError("encryption_key must be provided")
+            if is_production:
+                raise ValueError("encryption_key is REQUIRED in production environment")
+            # Generate a dev key
+            self.encryption_key = self._generate_dev_key()
+        
+        # Handle SSH key path (optional in dev, required in prod)
         if not self.ssh_key_path:
-            raise ValueError("ssh_key_path must be provided")
+            if is_production:
+                raise ValueError("ssh_key_path is REQUIRED in production environment")
+            # Use a placeholder for development
+            self.ssh_key_path = os.path.expanduser("~/.ssh/id_rsa")
+        
         if self.default_port_start >= self.default_port_end:
             raise ValueError("default_port_start must be less than default_port_end")
+    
+    @staticmethod
+    def _generate_dev_key() -> str:
+        """
+        Generate a development encryption key.
+        
+        WARNING: Use only in development! Do not use in production.
+        """
+        import base64
+        import os as os_module
+        dev_key = base64.b64encode(os_module.urandom(32)).decode('utf-8')
+        return dev_key
 
 
 @dataclass
@@ -120,6 +146,16 @@ class AppConfig:
         Returns:
             AppConfig: Configuration loaded from environment
         """
+        # Get centralized data directory
+        data_dir = get_app_data_dir()
+        logs_dir = get_logs_dir()
+        
+        # Default database path in app data directory
+        default_db_url = os.getenv(
+            "DATABASE_URL",
+            f"sqlite:///{data_dir / 'pyargus.db'}"
+        )
+        
         return AppConfig(
             app_name=os.getenv("APP_NAME", "PyArgus"),
             version=os.getenv("APP_VERSION", "0.1.0"),
@@ -127,10 +163,7 @@ class AppConfig:
             environment=os.getenv("ENVIRONMENT", "development"),
             log_level=os.getenv("LOG_LEVEL", "INFO"),
             database=DatabaseConfig(
-                database_url=os.getenv(
-                    "DATABASE_URL",
-                    "sqlite:///pyargus.db"
-                ),
+                database_url=default_db_url,
                 echo=os.getenv("DATABASE_ECHO", "false").lower() == "true",
             ),
             api=APIConfig(

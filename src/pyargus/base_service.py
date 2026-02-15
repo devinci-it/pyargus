@@ -10,8 +10,7 @@ from abc import ABC, abstractmethod
 from typing import Optional, Any, Dict
 
 from .application import ILogger
-from .exceptions import PyArgusException
-from .logging_config import LoggerConfigurator
+from .core.exceptions import PyArgusException
 
 
 class BaseService(ABC):

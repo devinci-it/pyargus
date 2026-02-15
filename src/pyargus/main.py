@@ -17,58 +17,75 @@ import os
 import sys
 import argparse
 
+from dotenv import load_dotenv
+from pylogger import SettingsBuilder, Logger,get_settings,info,log,success,error,debug,critical
+from pyargus.app_context  import AppContext, ctx
 # Add src to path for imports
 sys.path.insert(0, 'src')
 
 # ============================================================================
-# BOOTSTRAP: Load environment and configure logger FIRST
+# BOOTSTRAP: Configure PyLogger singleton from environment FIRST
 # ============================================================================
 def bootstrap_logger():
     """
-    Bootstrap PyLogger from environment variables before importing main app.
-    This must happen early to enable logging throughout the application.
+    Bootstrap PyLogger singleton from environment variables.
     
-    Returns:
-        Logger: Configured logger instance
+    After this runs, use Logger.instance() anywhere to get the configured logger.
+    PyLogger singleton automatically handles:
+    - File writing to log_dir (RotatingFileHandler)
+    - Console echo when echo=True
+    - FIFO for real-time streaming
     """
     from dotenv import load_dotenv
-    from pylogger import SettingsBuilder
+
     
     # Load environment variables
     if os.path.exists('.env'):
         load_dotenv('.env')
         print("✓ Loaded environment from .env")
     
-    # Configure logger from environment variables
-    logger = (SettingsBuilder()
+    is_production = os.getenv('APP_ENVIRONMENT', 'development') == 'production'
+    
+    # Configure PyLogger singleton
+    # Use preset_prod() for production (enables RotatingFileHandler)
+    # For development, still enable logging but with echo
+    builder = (SettingsBuilder()
         .app_name(os.getenv('PYLOGGER_APP_NAME', 'PyArgus'))
-        .development(os.getenv('PYLOGGER_DEVELOPMENT', 'true').lower() == 'true')
         .echo(os.getenv('PYLOGGER_ECHO', 'true').lower() == 'true')
         .level(os.getenv('PYLOGGER_LEVEL', 'DEBUG'))
         .log_dir(os.getenv('PYLOGGER_LOG_DIR', './logs'))
-        .build())
+        .env_path(os.getenv('PYLOGGER_ENV_PATH', '.env'))
+        .max_bytes(int(os.getenv('PYLOGGER_MAX_BYTES', '5242880')))
+        .backup_count(int(os.getenv('PYLOGGER_BACKUP_COUNT', '3')))
+        .fifo_enabled(os.getenv('PYLOGGER_FIFO_ENABLED', 'true').lower() == 'true'))
+
+    # Use production preset for file logging (RotatingFileHandler)
+    # This enables files to be written regardless of development/production mode
+    builder = builder.preset_prod()
     
-    return logger
+    # Allow development flag to override (adds extra verbosity)
+    if os.getenv('PYLOGGER_DEVELOPMENT', 'true').lower() == 'true':
+        builder = builder.development(True)
+    
+    builder.build()
+    
+    # Return singleton for convenience, but it's available via Logger.instance() anywhere
+    return Logger.instance()
 
-# Configure logger immediately at startup
+load_dotenv()
+# Configure logger singleton immediately at startup
 logger = bootstrap_logger()
-
-# Now we can use the logger throughout bootstrap
-from pylogger import build_log_decorator
+ctx.logger.info("PyArgus Logger initialized successfully")
 
 from pyargus import (
     Application,
     ApplicationFactory,
     AppConfig,
     ConfigurationError,
+    build_log_decorator,
 )
 
-
-def load_dotenv_legacy(env_file: str = ".env") -> None:
-    """Legacy function - dotenv now loaded in bootstrap_logger."""
-    pass
-
-
+@logger.log
 def parse_arguments() -> argparse.Namespace:
     """
     Parse command-line arguments.
@@ -128,7 +145,7 @@ Examples:
     
     return parser.parse_args()
 
-
+@log
 def create_app_config(args: argparse.Namespace) -> AppConfig:
     """
     Create application configuration from arguments and environment.
@@ -161,7 +178,7 @@ def create_app_config(args: argparse.Namespace) -> AppConfig:
     
     return config
 
-
+@log
 def main() -> int:
     """
     Main entry point for the application.

@@ -12,9 +12,8 @@ from abc import ABC, abstractmethod
 
 from pylogger import Logger as PyLogger
 
-from .config import AppConfig
-from .exceptions import ConfigurationError
-from .logging_config import LoggerConfigurator
+from .core.config import AppConfig
+from .core.exceptions import ConfigurationError
 
 
 class ILogger(ABC):
@@ -188,8 +187,7 @@ class Application:
             ConfigurationError: If configuration is invalid
         """
         self._config = config or AppConfig.from_env()        
-        # Configure PyLogger with app config
-        LoggerConfigurator.configure(self._config)
+        # Logging is configured by Bootstrap module
         
         self._container = DependencyContainer()
         self._logger = Logger(

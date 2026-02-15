@@ -25,8 +25,8 @@ class PyArgusException(Exception):
 class ConfigurationError(PyArgusException):
     """Raised when application configuration is invalid."""
     
-    def __init__(self, message: str):
-        super().__init__(message, "CONFIG_ERROR")
+    def __init__(self, message: str, error_code: str = "CONFIG_ERROR"):
+        super().__init__(message, error_code)
 
 
 class DatabaseError(PyArgusException):
